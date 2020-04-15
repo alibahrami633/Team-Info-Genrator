@@ -24,7 +24,7 @@ class Company {
 
     async getInfo() {
         try {
-            console.log("\n============================================================");
+            console.log("\n============================================================\n");
             await inquirer
                 .prompt([
                     {
@@ -165,7 +165,9 @@ class Company {
             }
 
             await writeFile(outputPath, this.outputFile);
+            console.log("\n============================================================");
             console.log("\nSuccess => Please check the 'output' folder");
+            console.log("\n============================================================");
 
             process.exit(0);
         }
