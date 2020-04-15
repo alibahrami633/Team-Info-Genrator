@@ -156,7 +156,6 @@ class Company {
         }
     }
 
-    /** Program Exit */
     async exitApp() {
         try {
             this.outputFile = render(this.employees);
