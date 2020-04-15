@@ -6,7 +6,6 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 const util = require("util");
-const clear = require("clear");
 const validator = require("email-validator");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output")
@@ -25,67 +24,50 @@ class Company {
 
     async getInfo() {
         try {
-            console.log("\n==============================");
+            console.log("\n============================================================");
             await inquirer
                 .prompt([
                     {
                         type: "input",
                         name: "role",
                         message: "Enter 'Manager' or 'Engineer' or 'Intern':",
-                        validate: function (val) {
+                        validate: (val) => {
                             const input = /[mei]/gi.test(val);
-                            if (!input) {
-                                return "Enter 'Manager' or 'Engineer' or 'Intern':";
-                            }
-                            else {
-                                return /[mei]/gi.test(val);
-                            }
+                            return input ? (/[mei]/gi.test(val)) : "Enter 'Manager' or 'Engineer' or 'Intern':";
                         },
                     },
                     {
                         type: "input",
                         name: "name",
                         message: "Enter name:",
-                        validate: function (val) {
-                            if (val.length) {
-                                return /[a-z]/gi.test(val);
-                            }
-                            else {
-                                return "Enter a correct name using 'a-z' letters:";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? /[a-z]/gi.test(val) : "Enter a correct name: ";
+                            return output;
                         },
                     },
                     {
                         type: "input",
                         name: "email",
                         message: "Enter email:",
-                        validate: function (val) {
-                            if (val.length) {
-                                return validator.validate(val);
-                            }
-                            else {
-                                return "Wrong format, enter a valid email:";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? validator.validate(val) : "Wrong format, enter a valid email:";
+                            return output;
                         },
                     },
                     {
                         type: "input",
                         name: "id",
                         message: "Enter id:",
-                        validate: function (val) {
-                            if (val.length) {
-                                return /[a-z0-9]/gi.test(val);
-                            }
-                            else {
-                                return "Enter correct ID containing 'a-z' letters and/or '0-9' numbers:";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? /[a-z0-9]/gi.test(val) : "Enter correct ID containing 'a-z' letters and/or '0-9' numbers:";
+                            return output;
                         },
                     },
                 ])
                 .then((response) => {
-                    this.inputtedDetail = response;
+                    this.answers = response;
                     this.role = response.role.toLowerCase();
-                    this.extraDetail();
+                    this.addRoleSpecificDetail();
                 });
         }
         catch (err) {
@@ -93,80 +75,53 @@ class Company {
         }
     }
 
-    async extraDetail() {
+    async addRoleSpecificDetail() {
         try {
-            if (this.role === "Manager") {
+            if (this.role === "manager") {
                 await inquirer
                     .prompt({
                         type: "input",
                         name: "officeNumber",
                         message: "Office Number: ",
-                        validate: function (val) {
-                            if (val.length) {
-                                return /[0-9]/gi.test(val);
-                            }
-                            else {
-                                return "Use numbers for ID: ";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? /[0-9]/gi.test(val) : "Use numbers for ID: ";
+                            return output;
                         },
                     })
                     .then((response) => {
-                        this.manager = new Manager(
-                            this.inputtedDetail.name,
-                            this.inputtedDetail.id,
-                            this.inputtedDetail.email,
-                            response.officeNumber
-                        );
+                        this.manager = new Manager(this.answers.name, this.answers.id, this.answers.email, response.officeNumber);
                         this.employees.push(this.manager);
                     });
             }
-            else if (this.role === "Engineer") {
+            else if (this.role === "engineer") {
                 await inquirer
                     .prompt({
                         type: "input",
                         name: "userName",
                         message: "Enter Github username:",
-                        validate: function (val) {
-                            if (val.length) {
-                                return /[a-z1-9]/gi.test(val);
-                            }
-                            else {
-                                return "github Username: ";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? /[a-z1-9]/gi.test(val) : "github Username: ";
+                            return output;
                         },
                     })
                     .then((data) => {
-                        const engineer = new Engineer(
-                            this.inputtedDetail.name,
-                            this.inputtedDetail.id,
-                            this.inputtedDetail.email,
-                            data.userName
-                        );
+                        const engineer = new Engineer(this.answers.name, this.answers.id, this.answers.email, data.userName);
                         this.employees.push(engineer);
                     });
             }
-            else if (this.role === "Intern") {
+            else if (this.role === "intern") {
                 await inquirer
                     .prompt({
                         type: "input",
                         name: "schoolName",
                         message: "School Name:",
-                        validate: function (val) {
-                            if (val.length) {
-                                return /[a-z1-9]/gi.test(val);
-                            }
-                            else {
-                                return "School Name: ";
-                            }
+                        validate: (val) => {
+                            const output = val.length ? /[a-z1-9]/gi.test(val) : "School Name: ";
+                            return output;
                         },
                     })
                     .then((data) => {
-                        const intern = new Intern(
-                            this.inputtedDetail.name,
-                            this.inputtedDetail.id,
-                            this.inputtedDetail.email,
-                            data.schoolName
-                        );
+                        const intern = new Intern(this.answers.name, this.answers.id, this.answers.email, data.schoolName);
                         this.employees.push(intern);
                     });
             }
@@ -174,6 +129,7 @@ class Company {
         catch (err) {
             console.log(err);
         }
+
         this.moreEntry();
     }
 
@@ -191,7 +147,7 @@ class Company {
                         this.getInfo();
                     }
                     else {
-                        this.exit();
+                        this.exitApp();
                     }
                 });
         }
@@ -201,19 +157,16 @@ class Company {
     }
 
     /** Program Exit */
-    async exit() {
+    async exitApp() {
         try {
             this.outputFile = render(this.employees);
 
             if (!fs.existsSync(OUTPUT_DIR)) {
                 fs.mkdirSync(OUTPUT_DIR);
             }
-            else {
-                console.log("\nPath already exists");
-            }
 
             await writeFile(outputPath, this.outputFile);
-            console.log("\nInput Data Success.");
+            console.log("\nSuccess => Please check the 'output' folder");
 
             process.exit(0);
         }
@@ -221,14 +174,7 @@ class Company {
             console.log(err);
         }
     }
-
-    /** Clears the screen */
-    clearScreen() {
-        clear();
-    }
 }
 
-const myCompany = new Company();
-
-myCompany.clearScreen();
+let myCompany = new Company();
 myCompany.getInfo();
