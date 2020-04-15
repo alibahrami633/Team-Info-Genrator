@@ -11,7 +11,7 @@ class Employee {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.role = "Employee";
+        this.role = this.constructor.name; // gets the name of the cunstructor and inherited classes constructors => Employee
     }
 
     /** Email getter */
