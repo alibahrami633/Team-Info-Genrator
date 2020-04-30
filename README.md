@@ -1,4 +1,4 @@
-## Note-Taker
+## Team Inforamtion Generator
 <br>
 
 
