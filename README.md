@@ -36,7 +36,7 @@
         Email Id
         School
 
-        The application then generates the team information file in a local folder named output and displays a link to the generated             file.
+        The application then generates the team information file in a local folder named output and displays a link to the generated file.
     </p>
 <hr/>
 <br>
